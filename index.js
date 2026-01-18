@@ -5,7 +5,8 @@ const FreeComBooks = require("./src/scraper/targets/freecombooks");
 
     const mathCategory = await freeComBooks.getCategoryList("/eeCategory.html");
     const mathDetailBooks = await freeComBooks.getBookDetail("/Ethical-Hacking-by-Gabriel-Rovesti.html");
-
-    console.log(mathDetailBooks);
+    const allCategory = await freeComBooks.getAllCategory();
+    console.log(allCategory);
+    // console.log(mathDetailBooks);
 })();
 

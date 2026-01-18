@@ -4,13 +4,29 @@ const cheerio = require('cheerio')
 class FreeComBooks {
     constructor(){
         this.baseUrl = "https://freecomputerbooks.com";
+        
+
     }
+    
    async getCategoryList(htmlPath){
     const data = await fetcher(this.baseUrl + htmlPath);
     const $ = cheerio.load(data);
     const listSubject = $("div#subjects").find("a");
     const result = [];
     listSubject.each((index, element) => {
+        const subject = $(element).text();
+        const url = $(element).attr("href");
+        result.push({subject, url});
+    });
+    return result;
+   }
+
+   async getAllCategory(){
+    const data = await fetcher(`${this.baseUrl}/sitemap.html`);
+    const $ = cheerio.load(data);
+    const allSubject = $('a.categoryTitle');
+    const result = [];
+    allSubject.each((index, element) => {
         const subject = $(element).text();
         const url = $(element).attr("href");
         result.push({subject, url});
@@ -41,7 +57,7 @@ class FreeComBooks {
         info: {}, // Gunakan objek terpisah untuk info buku
         downloadLinks: [] // Gunakan array untuk daftar link
     };
-
+ 
     const bookInformation = $("div#booktitle ul li");
     bookInformation.each((i, el) => {
         const fullText = $(el).text().trim();
