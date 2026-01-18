@@ -8,3 +8,15 @@ exports.getAllCategory = async(req, res) => {
         res.status(500).json({error: error.message});
     }
 }
+
+
+exports.getSubCategory = async(req, res) => {
+    try {
+        const result = await freeComBooks.getSubCategory(req.query.htmlPath);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+}
+
+

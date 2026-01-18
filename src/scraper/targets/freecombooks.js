@@ -3,10 +3,8 @@ const fetcher = require("../fetcher");
 const cheerio = require('cheerio')
 class FreeComBooks {
     constructor(){
-        this.baseUrl = "https://freecomputerbooks.com";
-        
+        this.baseUrl = "https://freecomputerbooks.com";   
     }
-
     async getAllCategory(){
     const data = await fetcher(`${this.baseUrl}/sitemap.html`);
     const $ = cheerio.load(data);
@@ -15,13 +13,12 @@ class FreeComBooks {
     allSubject.each((index, element) => {
         const subject = $(element).text();
         const url = $(element).attr("href");
-        result.push({subject, url});
+        result.push({subject, htmlPath});
     });
     return result;
    }
 
-
-   async getSubjectCategory(htmlPath){
+   async getSubCategory(htmlPath){
     const data = await fetcher(`${this.baseUrl}/${htmlPath}`);
     const $ = cheerio.load(data);
     const listSubject = $("div#subjects").find("a");
@@ -90,7 +87,6 @@ class FreeComBooks {
 
     return result;
 }
-
   
 }
 
