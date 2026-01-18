@@ -5,23 +5,9 @@ class FreeComBooks {
     constructor(){
         this.baseUrl = "https://freecomputerbooks.com";
         
-
     }
-    
-   async getCategoryList(htmlPath){
-    const data = await fetcher(this.baseUrl + htmlPath);
-    const $ = cheerio.load(data);
-    const listSubject = $("div#subjects").find("a");
-    const result = [];
-    listSubject.each((index, element) => {
-        const subject = $(element).text();
-        const url = $(element).attr("href");
-        result.push({subject, url});
-    });
-    return result;
-   }
 
-   async getAllCategory(){
+    async getAllCategory(){
     const data = await fetcher(`${this.baseUrl}/sitemap.html`);
     const $ = cheerio.load(data);
     const allSubject = $('a.categoryTitle');
@@ -34,8 +20,23 @@ class FreeComBooks {
     return result;
    }
 
+
+   async getSubjectCategory(htmlPath){
+    const data = await fetcher(`${this.baseUrl}/${htmlPath}`);
+    const $ = cheerio.load(data);
+    const listSubject = $("div#subjects").find("a");
+    const result = [];
+    listSubject.each((index, element) => {
+        const subject = $(element).text();
+        const url = $(element).attr("href");
+        result.push({subject, url});
+    });
+    return result;
+   }
+
+  
    async getBookByCategory(htmlPath){
-    const data = await fetcher(this.baseUrl + htmlPath);
+    const data = await fetcher(`${this.baseUrl}${htmlPath}`);
     const $ = cheerio.load(data);
     const listBooks = $("ul#newBooksL").find("li");
     
@@ -51,18 +52,18 @@ class FreeComBooks {
    }
 
   async getBookDetail(htmlPath) {
-    const data = await fetcher(this.baseUrl + htmlPath);
+    const data = await fetcher(`${this.baseUrl}/${htmlPath}`);
     const $ = cheerio.load(data);
     const result = {
-        info: {}, // Gunakan objek terpisah untuk info buku
-        downloadLinks: [] // Gunakan array untuk daftar link
+        info: {},
+        downloadLinks: [] 
     };
  
     const bookInformation = $("div#booktitle ul li");
     bookInformation.each((i, el) => {
         const fullText = $(el).text().trim();
         
-        // Cek apakah ada titik dua
+    
         if (fullText.includes(":")) {
             const splitText = fullText.split(":");
             const key = splitText[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -72,8 +73,6 @@ class FreeComBooks {
                 result.info[key] = value;
             }
         } else {
-            // Jika tidak ada ":", mungkin ini kasus Author yang menyatu
-            // Kita bisa pakai logika pencarian kata kunci
             if (fullText.toLowerCase().includes("author")) {
                 result.info.authors = fullText.replace(/author\(s\)/i, "").trim();
             }
@@ -81,8 +80,6 @@ class FreeComBooks {
     });
     const bookDescription = $("div#bookdesccontent p").eq(1).text().trim();
     result.info.description = bookDescription;
-
-    // Mengambil Link Download
     const downloadList = $('#downloadLinks').nextAll('ul').first();
     downloadList.find('li a').each((i, el) => {
         result.downloadLinks.push({
