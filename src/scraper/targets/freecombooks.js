@@ -13,13 +13,13 @@ class FreeComBooks {
     allSubject.each((index, element) => {
         const subject = $(element).text();
         const url = $(element).attr("href");
-        result.push({subject, htmlPath});
+        result.push({subject, url});
     });
     return result;
    }
 
-   async getSubCategory(htmlPath){
-    const data = await fetcher(`${this.baseUrl}/${htmlPath}`);
+   async getSubCategory(categoryPath){
+    const data = await fetcher(`${this.baseUrl}/${categoryPath}`);
     const $ = cheerio.load(data);
     const listSubject = $("div#subjects").find("a");
     const result = [];
@@ -32,8 +32,8 @@ class FreeComBooks {
    }
 
   
-   async getBookByCategory(htmlPath){
-    const data = await fetcher(`${this.baseUrl}${htmlPath}`);
+   async getBookByCategory(subCategoryPath){
+    const data = await fetcher(`${this.baseUrl}/${subCategoryPath}`);
     const $ = cheerio.load(data);
     const listBooks = $("ul#newBooksL").find("li");
     
@@ -48,8 +48,8 @@ class FreeComBooks {
     return result;
    }
 
-  async getBookDetail(htmlPath) {
-    const data = await fetcher(`${this.baseUrl}/${htmlPath}`);
+  async getBookDetail(bookPath) {
+    const data = await fetcher(`${this.baseUrl}/${bookPath}`);
     const $ = cheerio.load(data);
     const result = {
         info: {},
