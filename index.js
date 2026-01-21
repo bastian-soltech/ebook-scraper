@@ -4,19 +4,14 @@ const port = 3000;
 const cors = require('cors')
 const apiRoutes = require("./src/routes/index");
 
-
 app.use(cors({origin:'*'}))
 app.use(express.json());
 // app.use(compression());
-
 app.use("/", apiRoutes)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
-
-
-
 // const FreeComBooks = require("./src/scraper/targets/freecombooks");
 // (async () => {
 //     const freeComBooks = new FreeComBooks();

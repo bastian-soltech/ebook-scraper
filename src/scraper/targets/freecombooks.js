@@ -1,7 +1,13 @@
 
 const fetcher = require("../fetcher");
 const cheerio = require('cheerio')
+const puppeteer = require("puppeteer-core");
+const chromium = require("@sparticuz/chromium");
+const isProduction = process.env.NODE_ENV === 'production';
+// Optional: If you'd like to disable webgl, true is the default.
+chromium.setGraphicsMode = false;
 class FreeComBooks {
+
     constructor(){
         this.baseUrl = "https://freecomputerbooks.com";   
     }
@@ -86,6 +92,65 @@ class FreeComBooks {
     });
 
     return result;
+}
+
+async searchBook(q){
+    if (!q) {
+    return { error: 'Parameter pencarian (q) diperlukan' };
+  }
+
+  let browser = null;
+
+  try {
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: isProduction 
+        ? await chromium.executablePath() 
+        : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Jalur Chrome Lokal
+      headless: isProduction ? chromium.headless : false, // Di lokal set false biar kelihatan prosesnya
+    });
+
+    const page = await browser.newPage();
+    
+    // 1. Masuk ke URL pencarian website tersebut
+    const searchUrl = `https://freecomputerbooks.com/search2.html?q=${encodeURIComponent(q)}`;
+    await page.goto(searchUrl, { waitUntil: 'networkidle0' });
+
+    // 2. Tunggu sampai elemen hasil Google (GCSE) muncul di DOM
+    // Elemen .gsc-result biasanya muncul setelah script Google jalan
+    await page.waitForSelector('.gsc-result', { timeout: 5000 });
+
+    // 3. Extract data hasil pencarian
+    const results = await page.evaluate(() => {
+      const data = [];
+      const items = document.querySelectorAll('.gsc-webResult.gsc-result');
+      
+      items.forEach(item => {
+        const titleElement = item.querySelector('a.gs-title');
+        const snippetElement = item.querySelector('.gs-snippet');
+        
+        if (titleElement) {
+          data.push({
+            title: titleElement.innerText,
+            link: titleElement.href,
+            snippet: snippetElement ? snippetElement.innerText : ''
+          });
+        }
+      });
+      return data;
+    });
+
+    return results;
+
+  } catch (error) {
+    console.error('Gagal mengambil data:', error);
+  } finally {
+    if (browser !== null) {
+      await browser.close();
+    }
+  }
+    
 }
   
 }
