@@ -37,4 +37,13 @@ exports.getDetailsBook = async(req, res) => {
     }
 }
 
+exports.searchBook = async(req, res) => {
+    try {
+        const result = await freeComBooks.searchBook(req.query.q);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+}
+
 
