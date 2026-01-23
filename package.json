@@ -26,6 +26,7 @@
     "@sparticuz/chromium": "^143.0.4",
     "axios": "^1.13.2",
     "cheerio": "^1.1.2",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "puppeteer-core": "^24.35.0"
