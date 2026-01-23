@@ -116,21 +116,24 @@ async searchBook(q){
     const searchUrl = `https://freecomputerbooks.com/search2.html?q=${encodeURIComponent(q)}`;
     await page.goto(searchUrl, { waitUntil: 'networkidle0' });
     await page.waitForSelector('.gsc-result', { timeout: 6000 });
+
     const results = await page.evaluate(() => {
       const data = [];
       const items = document.querySelectorAll('.gsc-webResult.gsc-result');
       
       items.forEach(item => {
         const titleElement = item.querySelector('a.gs-title');
+        const bookPath = new URL(titleElement.href).pathname.replace('/','');
         const detailElement = item.querySelector('.gs-snippet');
         const imageElement = item.querySelector('img.gs-image')
+
         const imageSrc = imageElement ? imageElement.src : null;
 
         
         if (titleElement) {
           data.push({
             title: titleElement.innerText,
-            link: titleElement.href,
+            bookPath,
             image: imageSrc,
             detail: detailElement ? detailElement.innerText : ''
           });
