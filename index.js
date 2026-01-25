@@ -9,7 +9,7 @@ app.use(cors({origin:'*'}))
 app.use(express.json());
 app.use(compression());
 app.use("/", apiRoutes)
-
+    
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

@@ -63,6 +63,8 @@ class FreeComBooks {
     };
  
     const bookInformation = $("div#booktitle ul li");
+    const bookImage = $("td.imageColumn img").attr("src");
+    result.info.image = `${this.baseUrl}/${bookImage}`;
     bookInformation.each((i, el) => {
         const fullText = $(el).text().trim();
         
