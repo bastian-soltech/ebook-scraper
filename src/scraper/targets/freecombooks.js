@@ -47,7 +47,7 @@ class FreeComBooks {
     listBooks.each((index, element) => {
         const title = $(element).find("a").text();
         const detailUrl = $(element).find("a").attr("href");
-        const imgUrl = this.baseUrl + $(element).find("img").attr("src");
+        const imgUrl = `${this.baseUrl}/${$(element).find("img").attr("src")}`;
         result.push({title, detailUrl, imgUrl});
     });
    
