@@ -7,5 +7,6 @@ router.get("/v1/subcategory", getSubCategory);
 router.get("/v1/get-books", getBookByCategory);
 router.get("/v1/detail", getDetailsBook);
 router.get("/v1/search", searchBook);
+router.get("/v2/")
 
 module.exports = router;

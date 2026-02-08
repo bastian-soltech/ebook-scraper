@@ -48,7 +48,7 @@ class FreeComBooks {
         const title = $(element).find("a").text();
         const detailUrl = $(element).find("a").attr("href");
         const imgUrl = `${this.baseUrl}/${$(element).find("img").attr("src")}`;
-        result.push({title, detailUrl, imgUrl});
+      result.push({title, detailUrl, imgUrl});
     });
    
     return result;
