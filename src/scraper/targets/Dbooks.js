@@ -17,7 +17,10 @@ class Dbooks {
         const result = [];
         listCategory.each((index, element) => {
             const subject = $(element).text();
-            const categoryUrl = $(element).attr("href");
+            const fullUrl = $(element).attr("href");
+            const path = new URL(fullUrl).pathname
+            const categoryUrl =path.replace('/subject/', '').replace('/','');
+
             result.push({subject, categoryUrl});
         });
         return result;

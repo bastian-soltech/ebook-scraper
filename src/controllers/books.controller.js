@@ -1,12 +1,24 @@
-const {freeComBooks} = require("../services/books.service");
 
+const {freeComBooks, dbooks} = require("../services/books.service");
 exports.getAllCategory = async(req, res) => {
-    try {
-        const result = await freeComBooks.getAllCategory();
+    
+        // const result = await freeComBooks.getAllCategory();
+        try{
+const [FreeComBooks, Dbooks] = await Promise.allSettled([
+            freeComBooks.getAllCategory(),
+            dbooks.getAllCategory()
+        ]);
+        const result = [...FreeComBooks.value, ...Dbooks.value];
         res.json(result);
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
+        }catch(err){
+            console.error(err);
+            res.status(500).json({error: err.message});
+
+
+        }
+        
+       
+    
 }
 exports.getSubCategory = async(req, res) => {
     try {
