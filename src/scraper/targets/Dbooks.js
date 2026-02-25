@@ -30,12 +30,15 @@ class Dbooks {
         const data = await fetcher(`${this.baseUrl}subject/${slug}/${page}`);
         const $ = cheerio.load(data);
         const listBooks = $("div.main").find("div.wrap");
-        const result = [];
+        const totalPages = $("p.pagination").find("a").length;
+        
+        const result = {books:[],totalPages};
         listBooks.each((index, element) => {
             const title = $(element).find("a").text();
             const imageUrl = $(element).find("img").attr("data-src");
+            
             const bookId = imageUrl.replace("/img/books/","").replace(".jpg","").replace("s", "");
-            result.push({title, bookId, imageUrl});
+            result.books.push({title, bookId, imageUrl});
 
             // const detailUrl = $(element).find("a").attr("href");
             // const imgUrl = $(element).find("img").attr("src");

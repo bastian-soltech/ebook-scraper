@@ -39,6 +39,16 @@ exports.getBookByCategory = async(req, res) => {
         res.status(500).json({error: error.message});
     }
 }
+exports.getBookByCategoryV2 = async(req, res) => {
+    try {
+
+        const result = await dbooks.getBooksByCategory(req.query.slug,req.query.page);
+
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+}
 
 exports.getDetailsBook = async(req, res) => {
     try {
