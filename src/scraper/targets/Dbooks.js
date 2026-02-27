@@ -1,55 +1,61 @@
-const fetcher = require("../fetcher");
+const fetcher = require("../../utils/fetcher");
 const cheerio = require("cheerio");
+const { PROVIDERS } = require("../../config/constants");
 
 class Dbooks {
     constructor() {
-        this.baseUrl = "https://www.dbooks.org/";
-        
-
-    }
-    
-
-  async getAllCategory() {
-
-        const data = await fetcher(`${this.baseUrl}`);
-        const $ = cheerio.load(data);
-        const listCategory = $("div.subject div.main").find("a");
-        const result = [];
-        listCategory.each((index, element) => {
-            const subject = $(element).text();
-            const fullUrl = $(element).attr("href");
-            const path = new URL(fullUrl).pathname
-            const slug =path.replace('/subject/', '').replace('/','');
-
-            result.push({subject, slug, source:"dbooks"});
-        });
-        return result;
+        this.baseUrl = PROVIDERS.DBOOKS.BASE_URL;
+        this.sourceName = PROVIDERS.DBOOKS.NAME;
     }
 
-    async getBooksByCategory(slug,page=1){
-        const data = await fetcher(`${this.baseUrl}subject/${slug}/${page}`);
-        const $ = cheerio.load(data);
-        const listBooks = $("div.main").find("div.wrap");
-        const totalPages = $("p.pagination").find("a").length;
-        
-        const result = {books:[],totalPages};
-        listBooks.each((index, element) => {
-            const title = $(element).find("a").text();
-            const imageUrl = $(element).find("img").attr("data-src");
-            
-            const bookId = imageUrl.replace("/img/books/","").replace(".jpg","").replace("s", "");
-            result.books.push({title, bookId, imageUrl});
+    async getAllCategory() {
+        try {
+            const data = await fetcher(`${this.baseUrl}`);
+            const $ = cheerio.load(data);
+            const listCategory = $("div.subject div.main").find("a");
+            const result = [];
 
-            // const detailUrl = $(element).find("a").attr("href");
-            // const imgUrl = $(element).find("img").attr("src");
-            // result.push({title, detailUrl, imgUrl});
-            // const subject = $(element).text();
-            // console.log(subject)
-            // const categoryUrl = $(element).attr("href");
+            listCategory.each((_, element) => {
+                const subject = $(element).text().trim();
+                const fullUrl = $(element).attr("href");
+                if (fullUrl) {
+                    const path = new URL(fullUrl).pathname;
+                    const slug = path.replace('/subject/', '').replace('/', '');
+                    result.push({ subject, slug, source: this.sourceName });
+                }
+            });
+            return result;
+        } catch (error) {
+            console.error(`[Dbooks] Error in getAllCategory:`, error.message);
+            return []; // Return empty array on failure to prevent crashing Promise.all
+        }
+    }
+
+    async getBooksByCategory(slug, page = 1) {
+        try {
+            const data = await fetcher(`${this.baseUrl}subject/${slug}/${page}`);
+            const $ = cheerio.load(data);
+            const listBooks = $("div.main").find("div.wrap");
+            const totalPages = $("p.pagination").find("a").length;
+
+            const result = { books: [], totalPages };
             
-        });
-       
-       return result;
+            listBooks.each((_, element) => {
+                const title = $(element).find("a").text().trim();
+                const imageUrl = $(element).find("img").attr("data-src");
+                
+                if (imageUrl) {
+                    const bookId = imageUrl.replace("/img/books/", "").replace(".jpg", "").replace("s", "");
+                    result.books.push({ title, bookId, imageUrl });
+                }
+            });
+
+            return result;
+        } catch (error) {
+            console.error(`[Dbooks] Error in getBooksByCategory:`, error.message);
+            throw error;
+        }
     }
 }
+
 module.exports = Dbooks;
